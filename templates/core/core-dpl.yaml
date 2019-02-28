@@ -42,6 +42,8 @@ spec:
           periodSeconds: 10
         envFrom:
         - configMapRef:
+            name: keystone-config
+        - configMapRef:
             name: "{{ template "harbor.core" . }}"
         - secretRef:
             name: "{{ template "harbor.core" . }}"

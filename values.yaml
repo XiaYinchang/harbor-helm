@@ -2,13 +2,13 @@ expose:
   # Set the way how to expose the service. Set the type as "ingress", 
   # "clusterIP", "nodePort" or "loadBalancer" and fill the information 
   # in the corresponding section
-  type: ingress
+  type: clusterIP
   tls:
     # Enable the tls or not. Note: if the type is "ingress" and the tls 
     # is disabled, the port must be included in the command when pull/push
-    # images. Refer to https://github.com/goharbor/harbor/issues/5291 
+    # images. Refer to https://github.com/xyc11223344/harbor/issues/5291 
     # for the detail.
-    enabled: true
+    enabled: false
     # Fill the name of secret if you want to use your own TLS certificate
     # and private key. The secret must contain keys named tls.crt and 
     # tls.key that contain the certificate and private key to use for TLS
@@ -33,7 +33,7 @@ expose:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
   clusterIP:
     # The name of ClusterIP service
-    name: harbor
+    name: uai-harbor
     ports:
       # The service port Harbor listens on when serving with HTTP
       httpPort: 80
@@ -87,7 +87,7 @@ expose:
 # the IP address of k8s node 
 # 
 # If Harbor is deployed behind the proxy, set it as the URL of proxy
-externalURL: https://core.harbor.domain
+externalURL: http://uai.xiayinchang.top
 
 # The persistence is enabled by default and a default StorageClass
 # is needed in the k8s cluster to provision volumes dynamicly. 
@@ -221,7 +221,7 @@ imagePullPolicy: IfNotPresent
 
 logLevel: debug
 # The initial password of Harbor admin. Change it from portal after launching Harbor
-harborAdminPassword: "Harbor12345"
+harborAdminPassword: "uai"
 # The secret key used for encryption. Must be a string of 16 chars.
 secretKey: "not-a-secure-key"
 
@@ -243,8 +243,8 @@ nginx:
 
 portal:
   image:
-    repository: goharbor/harbor-portal
-    tag: dev
+    repository: xyc11223344/harbor-portal
+    tag: v2.18
   replicas: 1
 # resources:
 #  requests:
@@ -258,8 +258,8 @@ portal:
 
 core:
   image:
-    repository: goharbor/harbor-core
-    tag: dev
+    repository: xyc11223344/harbor-core
+    tag: v2.17
   replicas: 1
 # resources:
 #  requests:
@@ -330,7 +330,7 @@ chartmuseum:
   podAnnotations: {}
 
 clair:
-  enabled: true
+  enabled: false
   image:
     repository: goharbor/clair-photon
     tag: dev
@@ -352,7 +352,7 @@ clair:
   podAnnotations: {}
 
 notary:
-  enabled: true
+  enabled: false
   server:
     image:
       repository: goharbor/notary-server-photon
@@ -386,7 +386,7 @@ database:
       repository: goharbor/harbor-db
       tag: dev
     # The initial superuser password for internal database
-    password: "changeit"
+    password: "uai"
     # resources:
     #  requests:
     #    memory: 256Mi
@@ -395,10 +395,10 @@ database:
     tolerations: []
     affinity: {}
   external:
-    host: "192.168.0.1"
-    port: "5432"
-    username: "user"
-    password: "password"
+    host: "uai-tidb.uai-tidb"
+    port: "4000"
+    username: "harbor"
+    password: "uai"
     coreDatabase: "registry"
     clairDatabase: "clair"
     notaryServerDatabase: "notary_server"
@@ -410,7 +410,7 @@ database:
 redis:
   # if external Redis is used, set "type" to "external"
   # and fill the connection informations in "external" section
-  type: internal
+  type: external
   internal:
     image:
       repository: goharbor/redis-photon
@@ -423,7 +423,7 @@ redis:
     tolerations: []
     affinity: {}
   external:
-    host: "192.168.0.2"
+    host: "uai-redis.uai-redis"
     port: "6379"
     # The "coreDatabaseIndex" must be "0" as the library Harbor
     # used doesn't support configuring it
